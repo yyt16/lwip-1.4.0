@@ -85,6 +85,10 @@ static ip_addr_t ipaddr, netmask, gw;
 static unsigned char ping_flag;
 static ip_addr_t ping_addr;
 
+#if PPP_SUPPORT
+  sio_fd_t ppp_sio;
+#endif
+
 /* nonstatic debug cmd option, exported in lwipopts.h */
 unsigned char debug_flags;
 
@@ -152,11 +156,11 @@ pppLinkStatusCallback(void *ctx, int errCode, void *arg)
         struct ppp_addrs *ppp_addrs = arg;
 
         printf("pppLinkStatusCallback: PPPERR_NONE");
-        printf(" our_ipaddr=%s", _inet_ntoa(ppp_addrs->our_ipaddr.addr));
-        printf(" his_ipaddr=%s", _inet_ntoa(ppp_addrs->his_ipaddr.addr));
-        printf(" netmask=%s", _inet_ntoa(ppp_addrs->netmask.addr));
-        printf(" dns1=%s", _inet_ntoa(ppp_addrs->dns1.addr));
-        printf(" dns2=%s\n", _inet_ntoa(ppp_addrs->dns2.addr));
+        printf(" our_ipaddr=%s", inet_ntoa(ppp_addrs->our_ipaddr.addr));
+        printf(" his_ipaddr=%s", inet_ntoa(ppp_addrs->his_ipaddr.addr));
+        printf(" netmask=%s", inet_ntoa(ppp_addrs->netmask.addr));
+        printf(" dns1=%s", inet_ntoa(ppp_addrs->dns1.addr));
+        printf(" dns2=%s\n", inet_ntoa(ppp_addrs->dns2.addr));
         }
         break;
 
@@ -381,9 +385,7 @@ static void
 main_thread(void *arg)
 {
   sys_sem_t sem;
-#if PPP_SUPPORT
-  sio_fd_t ppp_sio;
-#endif
+
   LWIP_UNUSED_ARG(arg);
 
   netif_init();
@@ -423,9 +425,9 @@ main(int argc, char **argv)
   char ip_str[16] = {0}, nm_str[16] = {0}, gw_str[16] = {0};
 
   /* startup defaults (may be overridden by one or more opts) */
-  IP4_ADDR(&gw, 192,168,0,5);
+  IP4_ADDR(&gw, 192,168,1,5);
   IP4_ADDR(&netmask, 255,255,255,0);
-  IP4_ADDR(&ipaddr, 192,168,0,129);
+  IP4_ADDR(&ipaddr, 192,168,1,129);
   
   ping_flag = 0;
   /* use debug flags defined by debug.h */
